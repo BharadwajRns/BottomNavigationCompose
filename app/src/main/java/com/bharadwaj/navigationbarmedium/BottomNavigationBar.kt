@@ -8,25 +8,24 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bharadwaj.navigationbarmedium.screens.HomeScreen
 import com.bharadwaj.navigationbarmedium.screens.ProfileScreen
 import com.bharadwaj.navigationbarmedium.screens.SearchScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigationBar() {
-    var navigationSelectedItem by remember {
-        mutableStateOf(0)
-    }
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             NavigationBar {
-                BottomNavigationItem().bottomNavigationItems().forEachIndexed {index,navigationItem ->
+                BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->
                     NavigationBarItem(
-                        selected = index == navigationSelectedItem,
+                        selected = navigationItem.route == currentDestination?.route,
                         label = {
                             Text(navigationItem.label)
                         },
@@ -37,7 +36,6 @@ fun BottomNavigationBar() {
                             )
                         },
                         onClick = {
-                            navigationSelectedItem = index
                             navController.navigate(navigationItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
